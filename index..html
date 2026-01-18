@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<h3>Realtime Chat</h3>
+
+<div id="status"></div>
+<div id="typing" style="font-style:italic;color:gray"></div>
+
+<div id="chat"></div>
+
+<input id="msg" placeholder="Rubuta sako">
+<button onclick="send()">Send</button>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<style>
+body{font-family:Arial;background:#ece5dd}
+#chat{height:400px;overflow-y:auto;padding:10px}
+.msg{max-width:70%;padding:8px;margin:5px;border-radius:10px;clear:both}
+.me{background:#dcf8c6;float:right}
+.other{background:#fff;float:left}
+</style>
+</head>
+<meta charset="UTF-8">
+<title>Realtime Chat</title>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<style>
+body{font-family:Arial}
+#chat{height:400px;overflow-y:auto;border:1px solid #ccc;padding:5px}
+.msg{margin:5px;padding:5px;border-radius:5px;background:#f1f1f1}
+</style>
+</head>
+
+<body>
+
+<script>
+let username = localStorage.getItem("username");
+if(!username){
+  username = prompt("Shigar da sunanka");
+  localStorage.setItem("username", username);
+}
+</script>
+
+<h3>Realtime Chat</h3>
+
+<div id="chat"></div>
+
+<input id="name" placeholder="Sunanka"><br><br>
+<input id="msg" placeholder="Rubuta sako"><br><br>
+<button onclick="send()">Send</button>
+
+<script>
+var firebaseConfig = {
+  // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBm_9hZBB1Y_spMY1M8FoIoevfFFRiw5Wk",
+  authDomain: "free-chat-84bb2.firebaseapp.com",
+  projectId: "free-chat-84bb2",
+  storageBucket: "free-chat-84bb2.firebasestorage.app",
+  messagingSenderId: "455791979479",
+  appId: "1:455791979479:web:d0a5e83d826bd99c9db992",
+  measurementId: "G-0F07GH4DWY"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+};
+
+firebase.initializeApp(firebaseConfig);
+
+var db = firebase.database().ref("chat");
+
+db.on("child_added", function(snap){
+  let chat = document.getElementById("chat");
+  chat.innerHTML += `
+    <div class="msg">
+      <b>${snap.val().name}</b><br>
+      ${snap.val().msg}
+    </div>
+  `;
+  chat.scrollTop = chat.scrollHeight;
+});
+
+function send(){
+  db.push({
+    name: document.getElementById("name").value,
+    msg: document.getElementById("msg").value,
+    time: Date.now()
+  });
+  document.getElementById("msg").value="";
+}
+<script>
+var firebaseConfig = {
+  apiKey: "API_KEY",
+  authDomain: "PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://PROJECT_ID-default-rtdb.firebaseio.com",
+  projectId: "PROJECT_ID",
+  storageBucket: "PROJECT_ID.appspot.com",
+  messagingSenderId: "XXXX",
+  appId: "XXXX"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+// refs
+var db = firebase.database().ref("chat");
+var chat = document.getElementById("chat");
+var msgInput = document.getElementById("msg");
+
+// 🔵 ONLINE STATUS
+let statusRef = firebase.database().ref("status/" + username);
+statusRef.set("online");
+statusRef.onDisconnect().set("offline");
+
+firebase.database().ref("status").on("value", snap=>{
+  let online=[];
+  snap.forEach(s=>{ if(s.val()==="online") online.push(s.key); });
+  document.getElementById("status").innerText =
+    "Online: " + online.join(", ");
+});
+
+// 🟣 TYPING
+let typingRef = firebase.database().ref("typing/" + username);
+
+msgInput.addEventListener("input", ()=>{
+  typingRef.set("typing");
+  setTimeout(()=>typingRef.remove(),1500);
+});
+
+firebase.database().ref("typing").on("value", snap=>{
+  let t=[];
+  snap.forEach(s=>{ if(s.key!==username) t.push(s.key); });
+  document.getElementById("typing").innerText =
+    t.length ? t.join(", ")+" is typing..." : "";
+});
+
+// 💬 CHAT BUBBLES
+db.on("child_added", snap=>{
+  let d = snap.val();
+  let div = document.createElement("div");
+  div.className = "msg " + (d.name===username ? "me":"other");
+  div.innerHTML = `<b>${d.name}</b><br>${d.msg}`;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+});
+
+// ✉️ SEND
+function send(){
+  db.push({
+    name: username,
+    msg: msgInput.value,
+    time: Date.now()
+  });
+  msgInput.value="";
+  typingRef.remove();
+}
+</script>
+
+</body>
+</html>
+
+</body>
+</html>
