@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>free Chat</title>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<style>
+body{font-family:Arial}
+#chat{height:400px;overflow-y:auto;border:1px solid #ccc;padding:5px}
+.msg{margin:5px;padding:5px;border-radius:5px;background:#f1f1f1}
+</style>
+</head>
+
+<body>
+
+<h3>free Chat</h3>
+
+<div id="chat"></div>
+
+<input id="name" placeholder="Sunanka"><br><br>
+<input id="msg" placeholder="Rubuta sako"><br><br>
+<button onclick="send()">Send</button>
+
+<script>
+var firebaseConfig = {
+  // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBm_9hZBB1Y_spMY1M8FoIoevfFFRiw5Wk",
+  authDomain: "free-chat-84bb2.firebaseapp.com",
+  projectId: "free-chat-84bb2",
+  storageBucket: "free-chat-84bb2.firebasestorage.app",
+  messagingSenderId: "455791979479",
+  appId: "1:455791979479:web:d0a5e83d826bd99c9db992",
+  measurementId: "G-0F07GH4DWY"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+};
+
+firebase.initializeApp(firebaseConfig);
+
+var db = firebase.database().ref("chat");
+
+db.on("child_added", function(snap){
+  let chat = document.getElementById("chat");
+  chat.innerHTML += `
+    <div class="msg">
+      <b>${snap.val().name}</b><br>
+      ${snap.val().msg}
+    </div>
+  `;
+  chat.scrollTop = chat.scrollHeight;
+});
+
+function send(){
+  db.push({
+    name: document.getElementById("name").value,
+    msg: document.getElementById("msg").value,
+    time: Date.now()
+  });
+  document.getElementById("msg").value="";
+}
+</script>
+
+</body>
+</html>
